@@ -314,7 +314,7 @@ if __name__ == '__main__':
                 Uptime = get_uptime()
                 Load_1, Load_5, Load_15 = os.getloadavg()
                 MemoryTotal, MemoryUsed, SwapTotal, SwapFree = get_memory()
-                HDDTotal, HDDUsed, ReadBytes, WriteBytes = get_hdd()  # 更新为获取读写字节数
+                HDDTotal, HDDUsed = get_hdd()  # 更新为获取读写字节数
 
                 array = {}
                 if not timer:
