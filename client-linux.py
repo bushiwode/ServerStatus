@@ -11,8 +11,6 @@
 SERVER = "127.0.0.1"
 USER = "s01"
 
-
-
 PORT = 35601
 PASSWORD = "USER_DEFAULT_PASSWORD"
 INTERVAL = 1
@@ -53,22 +51,37 @@ def get_memory():
         key, value = match.groups(['key', 'value'])
         result[key] = int(value)
     MemTotal = float(result['MemTotal'])
-    MemUsed = MemTotal-float(result['MemFree'])-float(result['Buffers'])-float(result['Cached'])-float(result['SReclaimable'])
+    MemUsed = MemTotal - float(result['MemFree']) - float(result['Buffers']) - float(result['Cached']) - float(result['SReclaimable'])
     SwapTotal = float(result['SwapTotal'])
     SwapFree = float(result['SwapFree'])
     return int(MemTotal), int(MemUsed), int(SwapTotal), int(SwapFree)
 
 def get_hdd():
+    # 获取硬盘总大小和已用大小
     p = subprocess.check_output(['df', '-Tlm', '--total', '-t', 'ext4', '-t', 'ext3', '-t', 'ext2', '-t', 'reiserfs', '-t', 'jfs', '-t', 'ntfs', '-t', 'fat32', '-t', 'btrfs', '-t', 'fuseblk', '-t', 'zfs', '-t', 'simfs', '-t', 'xfs']).decode("Utf-8")
     total = p.splitlines()[-1]
     used = total.split()[3]
     size = total.split()[2]
-    return int(size), int(used)
+
+    # 获取硬盘读写数据信息
+    iostat_output = subprocess.check_output(['iostat', '-d', '-k', '1', '2']).decode("Utf-8")
+    iostat_lines = iostat_output.splitlines()
+    
+    # 解析 iostat 输出
+    read_bytes = 0
+    write_bytes = 0
+    for line in iostat_lines[3:]:  # 跳过前几行标题
+        if line.strip():  # 确保行不为空
+            parts = line.split()
+            read_bytes += int(parts[5])  # 第6列是读字节数
+            write_bytes += int(parts[6])  # 第7列是写字节数
+
+    return int(size), int(used), read_bytes, write_bytes
 
 def get_time():
     with open("/proc/stat", "r") as f:
         time_list = f.readline().split(' ')[2:6]
-        for i in range(len(time_list))  :
+        for i in range(len(time_list)):
             time_list[i] = int(time_list[i])
         return time_list
 
@@ -77,7 +90,7 @@ def delta_time():
     time.sleep(INTERVAL)
     y = get_time()
     for i in range(len(x)):
-        y[i]-=x[i]
+        y[i] -= x[i]
     return y
 
 def get_cpu():
@@ -85,7 +98,7 @@ def get_cpu():
     st = sum(t)
     if st == 0:
         st = 1
-    result = 100-(t[len(t)-1]*100.00/st)
+    result = 100 - (t[len(t) - 1] * 100.00 / st)
     return round(result, 1)
 
 def liuliang():
@@ -99,7 +112,7 @@ def liuliang():
                         or 'docker' in netinfo[0][0] or 'veth' in netinfo[0][0] \
                         or 'br-' in netinfo[0][0] or 'vmbr' in netinfo[0][0] \
                         or 'vnet' in netinfo[0][0] or 'kube' in netinfo[0][0] \
-                        or netinfo[0][1]=='0' or netinfo[0][9]=='0':
+                        or netinfo[0][1] == '0' or netinfo[0][9] == '0':
                     continue
                 else:
                     NET_IN += int(netinfo[0][1])
@@ -111,17 +124,17 @@ def tupd():
     tcp, udp, process, thread count: for view ddcc attack , then send warning
     :return:
     '''
-    return 0,0,0,0
+    return 0, 0, 0, 0
     
     s = subprocess.check_output("ss -t|wc -l", shell=True)
-    t = int(s[:-1])-1
+    t = int(s[:-1]) - 1
     s = subprocess.check_output("ss -u|wc -l", shell=True)
-    u = int(s[:-1])-1
+    u = int(s[:-1]) - 1
     s = subprocess.check_output("ps -ef|wc -l", shell=True)
-    p = int(s[:-1])-2
+    p = int(s[:-1]) - 2
     s = subprocess.check_output("ps -eLf|wc -l", shell=True)
-    d = int(s[:-1])-2
-    return t,u,p,d
+    d = int(s[:-1]) - 2
+    return t, u, p, d
 
 def get_network(ip_version):
     if(ip_version == 4):
@@ -165,7 +178,7 @@ def _ping_thread(host, mark, port):
             else:
                 IP = socket.getaddrinfo(host, None, socket.AF_INET6)[0][4][0]
         except Exception:
-                pass
+            pass
 
     while True:
         if packet_queue.full():
@@ -180,7 +193,6 @@ def _ping_thread(host, mark, port):
             if error.errno == errno.ECONNREFUSED:
                 pingTime[mark] = int((timeit.default_timer() - b) * 1000)
                 packet_queue.put(1)
-            #elif error.errno == errno.ETIMEDOUT:
             else:
                 lostPacket += 1
                 packet_queue.put(0)
@@ -315,14 +327,14 @@ if __name__ == '__main__':
                 Uptime = get_uptime()
                 Load_1, Load_5, Load_15 = os.getloadavg()
                 MemoryTotal, MemoryUsed, SwapTotal, SwapFree = get_memory()
-                HDDTotal, HDDUsed = get_hdd()
+                HDDTotal, HDDUsed, ReadBytes, WriteBytes = get_hdd()  # 更新为获取读写字节数
 
                 array = {}
                 if not timer:
                     array['online' + str(check_ip)] = get_network(check_ip)
                     timer = 10
                 else:
-                    timer -= 1*INTERVAL
+                    timer -= 1 * INTERVAL
 
                 array['uptime'] = Uptime
                 array['load_1'] = Load_1
@@ -334,6 +346,8 @@ if __name__ == '__main__':
                 array['swap_used'] = SwapTotal - SwapFree
                 array['hdd_total'] = HDDTotal
                 array['hdd_used'] = HDDUsed
+                array['hdd_read_bytes'] = ReadBytes  # 添加读字节数
+                array['hdd_write_bytes'] = WriteBytes  # 添加写字节数
                 array['cpu'] = CPU
                 array['network_rx'] = netSpeed.get("netrx")
                 array['network_tx'] = netSpeed.get("nettx")
