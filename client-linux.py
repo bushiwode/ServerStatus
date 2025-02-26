@@ -63,20 +63,7 @@ def get_hdd():
     used = total.split()[3]
     size = total.split()[2]
 
-    # 获取硬盘读写数据信息
-    iostat_output = subprocess.check_output(['iostat', '-d', '-k', '1', '2']).decode("Utf-8")
-    iostat_lines = iostat_output.splitlines()
-    
-    # 解析 iostat 输出
-    read_bytes = 0
-    write_bytes = 0
-    for line in iostat_lines[3:]:  # 跳过前几行标题
-        if line.strip():  # 确保行不为空
-            parts = line.split()
-            read_bytes += int(parts[5])  # 第6列是读字节数
-            write_bytes += int(parts[6])  # 第7列是写字节数
-
-    return int(size), int(used), read_bytes, write_bytes
+    return int(size), int(used)
 
 def get_time():
     with open("/proc/stat", "r") as f:
