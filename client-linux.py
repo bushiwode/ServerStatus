@@ -333,8 +333,6 @@ if __name__ == '__main__':
                 array['swap_used'] = SwapTotal - SwapFree
                 array['hdd_total'] = HDDTotal
                 array['hdd_used'] = HDDUsed
-                array['hdd_read_bytes'] = ReadBytes  # 添加读字节数
-                array['hdd_write_bytes'] = WriteBytes  # 添加写字节数
                 array['cpu'] = CPU
                 array['network_rx'] = netSpeed.get("netrx")
                 array['network_tx'] = netSpeed.get("nettx")
