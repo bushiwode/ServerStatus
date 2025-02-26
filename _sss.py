@@ -8,12 +8,14 @@ import json
 import sys
 import os
 import requests
-import random,string
+import random
+import string
 import subprocess
 import uuid
+import secrets  # 新增：用于生成安全随机数
 
 CONFIG_FILE = "config.json"
-GITHUB_RAW_URL = "https://raw.githubusercontent.com/lidalao/ServerStatus/master"
+GITHUB_RAW_URL = "https://raw.githubusercontent.com/bushiwode/ServerStatus/master"
 IP_URL = "https://api.ipify.org"
 
 jjs = {}
@@ -22,10 +24,9 @@ ip = ""
 def how2agent(user, passwd):
     print('```')
     print("\n")
-    print('curl -L {0}/sss-agent.sh  -o sss-agent.sh && chmod +x sss-agent.sh && sudo ./sss-agent.sh {1} {2} {3}'.format(GITHUB_RAW_URL, getIP(), user, passwd))
+    print(f'curl -L {GITHUB_RAW_URL}/sss-agent.sh  -o sss-agent.sh && chmod +x sss-agent.sh && sudo ./sss-agent.sh {getIP()} {user} {passwd}')
     print("\n")
     print('```')
-
 
 def getIP():
     global ip
@@ -41,34 +42,15 @@ def restartSSS():
     p.wait()
 
 def getPasswd():
-	mima = [] 
-	sz = '123456789'
-	xzm = 'abcdefghijklmnopqrstuvwxyz'
-	dzm = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-	# tzf = '~!#@$%^&*?'
-	# all = sz + xzm + dzm + tzf
-	all = sz + xzm + dzm 
-	m1 = random.choice(sz)
-
-	m2 = random.choice(xzm)
-	m3 = random.choice(dzm)
-	# m4 = random.choice(tzf)
-	m5 = "".join(random.sample(all,12))
-	mima.append(m1)
-	mima.append(m2)
-	mima.append(m3)
-	# mima.append(m4)
-	mima.append(m5)
-	random.shuffle(mima)
-	a = "".join(mima)
-	return a
+    # 使用 secrets 模块生成更安全的随机密码
+    return ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(12))
 
 def saveJJs():
     jjs['servers'] = sorted(jjs['servers'], key=lambda d: d['name']) 
 
-    file = open(CONFIG_FILE,"w")
-    file.write(json.dumps(jjs))
-    file.close()
+    # 使用上下文管理器处理文件
+    with open(CONFIG_FILE, "w") as file:
+        json.dump(jjs, file)
 
 def _show():
     print("---你的jjs如下---")
@@ -80,7 +62,7 @@ def _show():
         return
     
     for idx, item in enumerate(jjs['servers']):
-        print(str(idx) + ". name: " + item['name'] + ", loc: "+ item['location'] + ", type: " + item['type']) 
+        print(f"{idx}. name: {item['name']}, loc: {item['location']}, type: {item['type']}") 
     
     print("\n")
     print("-----------------")
@@ -96,19 +78,19 @@ def _back():
 
 def add():
     print('>>>请输入jj名字：')
-    jjname =input()    
+    jjname = input()    
     if jjname == "":
         print("输入有误")
         _back()
         return
 
-    print('>>>请输入{0}位置：[{1}]'.format(jjname, "us"))
-    jjloc =input()
+    print(f'>>>请输入{jjname}位置：[{ "us" }]')
+    jjloc = input()
     if jjloc == "":
         jjloc = "us"
 
-    print('>>>请输入{0}类型：[{1}]'.format(jjname, "kvm"))
-    jjtype =input()
+    print(f'>>>请输入{jjname}类型：[{ "kvm" }]')
+    jjtype = input()
     if jjtype == "":
         jjtype = "kvm"  
      
@@ -128,7 +110,7 @@ def add():
 
     print("添加成功!")
     _show()
-    print('>>>请复制以下命令在机器{0}安装agent服务'.format(item['name']))
+    print(f'>>>请复制以下命令在机器{item["name"]}安装agent服务')
     how2agent(item['username'], item['password'])
     _back()
 
@@ -146,25 +128,25 @@ def update():
         return
 
     jj = jjs['servers'][int(idx)]
-    print('--- 面板更换ip时，请复制以下命令在机器{0}安装agent服务 ---'.format(jj['name']))
+    print(f'--- 面板更换ip时，请复制以下命令在机器{jj["name"]}安装agent服务 ---')
     how2agent(jj['username'], jj['password'])
 
-    print('>>>请输入{0}新名字：[{1}] *中括号内为原值，按回车表示不做修改*'.format(jj['name'], jj['name']))
+    print(f'>>>请输入{jj["name"]}新名字：[{jj["name"]}] *中括号内为原值，按回车表示不做修改*')
     jjname = input()
     if "" != jjname:
         jjs['servers'][int(idx)]['name'] = jjname
     
-    print('>>>请输入{0}新位置：[{1}]'.format(jj['name'], jj['location']))
+    print(f'>>>请输入{jj["name"]}新位置：[{jj["location"]}]')
     jjloc = input()
     if "" != jjloc:
         jjs['servers'][int(idx)]['location'] = jjloc
     
-    print('>>>请输入{0}新类型：[{1}]'.format(jj['name'], jj['type']))
+    print(f'>>>请输入{jj["name"]}新类型：[{jj["type"]}]')
     jjtype = input()
     if "" != jjtype:
         jjs['servers'][int(idx)]['type'] = jjtype
     
-    print('>>>请输入{0}新的月流量起始日：[{1}]'.format(jj['name'], jj['monthstart']))
+    print(f'>>>请输入{jj["name"]}新的月流量起始日：[{jj["monthstart"]}]')
     jjms = input()
     if "" != jjms:
         jjs['servers'][int(idx)]['monthstart'] = jjms
@@ -182,7 +164,7 @@ def update():
 
 def remove():
     print(">>>请输入需要删除的jj标号：")
-    idx =input()
+    idx = input()
     if not idx.isnumeric():
         print('无效输入,退出')
         _back()
@@ -193,9 +175,9 @@ def remove():
         _back()
         return
     
-    print('>>>请确认你需要删除的节点：{0}？ [Y/n]'.format(jjs['servers'][int(idx)]['name'])) 
-    yesOrNo =  input()
-    if yesOrNo == "n" or yesOrNo == "N":
+    print(f'>>>请确认你需要删除的节点：{jjs["servers"][int(idx)]["name"]}？ [Y/n]') 
+    yesOrNo = input()
+    if yesOrNo.lower() == "n":
         print("取消删除")
         _back()
         return
@@ -236,14 +218,13 @@ def cmd():
         print('无效输入, 退出')
         return
 
-
 if __name__ == '__main__':
-    file_exists = os.path.exists(CONFIG_FILE)
-    if file_exists == False: 
+    if not os.path.exists(CONFIG_FILE): 
         print("请在当前目录创建config.json!")
         exit()
     
-    file = open(CONFIG_FILE,"r")
-    jjs = json.load(file)
-    file.close()
+    # 使用上下文管理器处理文件
+    with open(CONFIG_FILE, "r") as file:
+        jjs = json.load(file)
+    
     cmd()
