@@ -97,7 +97,7 @@ uninstall_agent() {
 show_menu() {
     echo -e "
     ${green}Server Status监控管理脚本${plain}
-    --- https://github.com/lidalao/sss ---
+    --- https://github.com/bushiwode/sss ---
     ${green}1.${plain}  安装监控Agent
     ${green}2.${plain}  卸载Agent
     ${green}0.${plain}  退出脚本
