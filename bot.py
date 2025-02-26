@@ -33,7 +33,7 @@ def send2tg(srv, flag):
 
     if flag == 1 : # online
         if srv in offs:
-            if counterOn[srv] < 10:
+            if counterOn[srv] < 100: #调整监控报警频率
                 counterOn[srv] += 1
                 return
             #1. Remove srv from offs; 2. Send to tg: I am online
@@ -43,7 +43,7 @@ def send2tg(srv, flag):
             _send(text)
     else: #offline
         if srv not in offs:
-            if counterOff[srv] < 10:
+            if counterOff[srv] < 100: #调整监控报警频率
                 counterOff[srv] += 1
                 return
             #1. Append srv to offs; 2. Send to tg: I am offline
