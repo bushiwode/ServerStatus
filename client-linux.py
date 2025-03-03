@@ -157,7 +157,7 @@ diskIO = {
     'read': 0,
     'write': 0
 }
-
+monitorServer = {}
 
 def _ping_thread(host, mark, port):
     lostPacket = 0
