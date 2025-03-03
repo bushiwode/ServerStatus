@@ -152,6 +152,11 @@ netSpeed = {
     'avgrx': 0,
     'avgtx': 0
 }
+diskIO = {
+    'read': 0,
+    'write': 0
+}
+monitorServer = {}
 
 def _ping_thread(host, mark, port):
     lostPacket = 0
