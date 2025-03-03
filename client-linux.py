@@ -22,6 +22,7 @@ CT = "ct.tz.cloudcpp.com"
 CM = "cm.tz.cloudcpp.com"
 
 import socket
+import ssl
 import time
 import timeit
 import re
