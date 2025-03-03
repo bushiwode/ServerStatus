@@ -214,6 +214,67 @@ def _net_speed():
             netSpeed["avgtx"] = avgtx
         time.sleep(INTERVAL)
 
+def _disk_io():
+    '''
+    good luck for opensource! by: cpp.la
+    磁盘IO：因为IOPS原因，SSD和HDD、包括RAID卡，ZFS等阵列技术。IO对性能的影响还需要结合自身服务器情况来判断。
+    比如我这里是机械硬盘，大量做随机小文件读写，那么很低的读写也就能造成硬盘长时间的等待。
+    如果这里做连续性IO，那么普通机械硬盘写入到100Mb/s，那么也能造成硬盘长时间的等待。
+    磁盘读写有误差：4k，8k ，https://stackoverflow.com/questions/34413926/psutil-vs-dd-monitoring-disk-i-o
+    :return:
+    '''
+    while True:
+        # pre pid snapshot
+        snapshot_first = {}
+        # next pid snapshot
+        snapshot_second = {}
+        # read count snapshot
+        snapshot_read = 0
+        # write count snapshot
+        snapshot_write = 0
+        # process snapshot
+        pid_snapshot = [str(i) for i in os.listdir("/proc") if i.isdigit() is True]
+        for pid in pid_snapshot:
+            try:
+                with open("/proc/{}/io".format(pid)) as f:
+                    pid_io = {}
+                    for line in f.readlines():
+                        if "read_bytes" in line:
+                            pid_io["read"] = int(line.split("read_bytes:")[-1].strip())
+                        elif "write_bytes" in line and "cancelled_write_bytes" not in line:
+                            pid_io["write"] = int(line.split("write_bytes:")[-1].strip())
+                    pid_io["name"] = open("/proc/{}/comm".format(pid), "r").read().strip()
+                    snapshot_first[pid] = pid_io
+            except:
+                if pid in snapshot_first:
+                    snapshot_first.pop(pid)
+
+        time.sleep(INTERVAL)
+
+        for pid in pid_snapshot:
+            try:
+                with open("/proc/{}/io".format(pid)) as f:
+                    pid_io = {}
+                    for line in f.readlines():
+                        if "read_bytes" in line:
+                            pid_io["read"] = int(line.split("read_bytes:")[-1].strip())
+                        elif "write_bytes" in line and "cancelled_write_bytes" not in line:
+                            pid_io["write"] = int(line.split("write_bytes:")[-1].strip())
+                    pid_io["name"] = open("/proc/{}/comm".format(pid), "r").read().strip()
+                    snapshot_second[pid] = pid_io
+            except:
+                if pid in snapshot_first:
+                    snapshot_first.pop(pid)
+                if pid in snapshot_second:
+                    snapshot_second.pop(pid)
+
+        for k, v in snapshot_first.items():
+            if snapshot_first[k]["name"] == snapshot_second[k]["name"] and snapshot_first[k]["name"] != "bash":
+                snapshot_read += (snapshot_second[k]["read"] - snapshot_first[k]["read"])
+                snapshot_write += (snapshot_second[k]["write"] - snapshot_first[k]["write"])
+        diskIO["read"] = snapshot_read
+        diskIO["write"] = snapshot_write
+
 def get_realtime_date():
     t1 = threading.Thread(
         target=_ping_thread,
@@ -347,6 +408,8 @@ if __name__ == '__main__':
                 array['time_189'] = pingTime.get('189')
                 array['time_10086'] = pingTime.get('10086')
                 array['tcp'], array['udp'], array['process'], array['thread'] = tupd()
+                array['io_read'] = diskIO.get("read")
+                array['io_write'] = diskIO.get("write")
 
                 s.send(byte_str("update " + json.dumps(array) + "\n"))
         except KeyboardInterrupt:
