@@ -32,10 +32,10 @@ import json
 import errno
 import subprocess
 import threading
-try:
-    from queue import Queue     # python3
-except ImportError:
-    from Queue import Queue     # python2
+if sys.version_info.major == 3:
+    from queue import Queue
+elif sys.version_info.major == 2:
+    from Queue import Queue
 
 def get_uptime():
     with open('/proc/uptime', 'r') as f:
