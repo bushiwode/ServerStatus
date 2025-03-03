@@ -6,7 +6,7 @@
 # 说明: 默认情况下修改server和user就可以了。丢包率监测方向可以自定义，例如：CU = "www.facebook.com"。
 #
 # 20211117: 移除tupd信息 (Update by: https://github.com/lidalao/ServerStatus)
-# 20211117: 补充tupd信息、io读写信息 (Update by: https://github.com/bushiwode/ServerStatus)
+# 20250303: 补充tupd信息、io读写信息 (Update by: https://github.com/bushiwode/ServerStatus)
 
 SERVER = "127.0.0.1"
 USER = "s01"
