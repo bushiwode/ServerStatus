@@ -113,7 +113,7 @@ def tupd():
     :return:
     '''
 #    return 0, 0, 0, 0
-    
+
     s = subprocess.check_output("ss -t|wc -l", shell=True)
     t = int(s[:-1]) - 1
     s = subprocess.check_output("ss -u|wc -l", shell=True)
@@ -157,12 +157,14 @@ diskIO = {
     'read': 0,
     'write': 0
 }
-monitorServer = {}
+
 
 def _ping_thread(host, mark, port):
     lostPacket = 0
     packet_queue = Queue(maxsize=PING_PACKET_HISTORY_LEN)
 
+    while True:
+        # flush dns , every time.
     IP = host
     if host.count(':') < 1:     # if not plain ipv6 address, means ipv4 address or hostname
         try:
@@ -173,7 +175,6 @@ def _ping_thread(host, mark, port):
         except Exception:
             pass
 
-    while True:
         if packet_queue.full():
             if packet_queue.get() == 0:
                 lostPacket -= 1
@@ -186,6 +187,7 @@ def _ping_thread(host, mark, port):
             if error.errno == errno.ECONNREFUSED:
                 pingTime[mark] = int((timeit.default_timer() - b) * 1000)
                 packet_queue.put(1)
+            #elif error.errno == errno.ETIMEDOUT:
             else:
                 lostPacket += 1
                 packet_queue.put(0)
@@ -281,7 +283,11 @@ def _disk_io():
         diskIO["read"] = snapshot_read
         diskIO["write"] = snapshot_write
 
-def get_realtime_date():
+def get_realtime_data():
+    '''
+    real time get system data
+    :return:
+    '''
     t1 = threading.Thread(
         target=_ping_thread,
         kwargs={
@@ -309,14 +315,12 @@ def get_realtime_date():
     t4 = threading.Thread(
         target=_net_speed,
     )
-    t1.setDaemon(True)
-    t2.setDaemon(True)
-    t3.setDaemon(True)
-    t4.setDaemon(True)
-    t1.start()
-    t2.start()
-    t3.start()
-    t4.start()
+    t5 = threading.Thread(
+        target=_disk_io,
+    )
+    for ti in [t1, t2, t3, t4, t5]:
+        ti.daemon = True
+        ti.start()
 
 def byte_str(object):
     '''
@@ -344,7 +348,7 @@ if __name__ == '__main__':
         elif 'INTERVAL' in argc:
             INTERVAL = int(argc.split('INTERVAL=')[-1])
     socket.setdefaulttimeout(30)
-    get_realtime_date()
+    get_realtime_data()
     while True:
         try:
             print("Connecting...")
@@ -405,8 +409,6 @@ if __name__ == '__main__':
                 array['network_tx'] = netSpeed.get("nettx")
                 array['network_in'] = NET_IN
                 array['network_out'] = NET_OUT
-                # todo：兼容旧版本，下个版本删除ip_status
-                array['ip_status'] = True
                 array['ping_10010'] = lostRate.get('10010') * 100
                 array['ping_189'] = lostRate.get('189') * 100
                 array['ping_10086'] = lostRate.get('10086') * 100
