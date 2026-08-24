@@ -111,18 +111,14 @@ docker compose --profile telegram logs --tail=100 bot
 
 ### 5. 更新
 
-更新会保留 `config.json`、`.env` 和 `json/` 中的历史数据。安装器会先验证并拉取新镜像，启动失败时尝试恢复原部署。
+更新会保留 `config.json`、`.env` 和 `json/` 中的历史数据。管理脚本会先安全更新自身，再验证并拉取新镜像；启动失败时尝试恢复原部署。
 
 ```bash
 cd /root/data/docker_data/serverstatus
-
-curl --fail --location \
-  https://raw.githubusercontent.com/Lau0x/ServerStatus/master/sss.sh \
-  -o sss.sh
-
-chmod +x sss.sh
 sudo ./sss.sh --upgrade
 ```
+
+2026-08-24 之前安装的旧脚本不支持自动更新，仅首次过渡需要重新下载一次 `sss.sh`；此后都只需执行上面的升级命令。
 
 更新后确认容器状态：
 

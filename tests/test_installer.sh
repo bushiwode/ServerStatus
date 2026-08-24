@@ -33,6 +33,27 @@ file_mode() {
     stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1"
 }
 
+mkdir self-update-test
+printf '%s\n' '#!/bin/bash' 'printf old' > self-update-test/current.sh
+printf '%s\n' '#!/bin/bash' 'printf new' > self-update-test/candidate.sh
+self_update_candidate="${test_root}/self-update-test/candidate.sh"
+download_file_definition=$(declare -f download_file)
+download_file() { install -m 0644 "$self_update_candidate" "$2"; }
+update_script_file self-update-test/current.sh
+cmp -s self-update-test/current.sh self-update-test/candidate.sh
+[[ $(file_mode self-update-test/current.sh) == 755 ]]
+if update_script_file self-update-test/current.sh; then
+    exit 1
+fi
+printf '%s\n' '#!/bin/bash' 'broken (' > self-update-test/candidate.sh
+set +e
+(update_script_file self-update-test/current.sh) >/dev/null 2>&1
+status=$?
+set -e
+[[ $status -eq 1 ]]
+grep -qx 'printf new' self-update-test/current.sh
+eval "$download_file_definition"
+
 docker() {
     case "$*" in
         "compose version") return 0 ;;

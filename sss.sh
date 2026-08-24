@@ -97,6 +97,47 @@ atomic_replace() {
     fi
 }
 
+update_script_file() {
+    local current_path="$1" stage
+    stage=$(mktemp -d) || die "创建脚本更新暂存目录失败"
+    chmod 0700 "$stage" || { rm -rf -- "$stage"; die "保护脚本更新暂存目录失败"; }
+    if ! download_file "${GITHUB_RAW_URL}/sss.sh" "${stage}/sss.sh"; then
+        rm -rf -- "$stage"
+        die "管理脚本更新下载失败，现有部署未修改"
+    fi
+    if ! bash -n "${stage}/sss.sh"; then
+        rm -rf -- "$stage"
+        die "新管理脚本校验失败，现有脚本未修改"
+    fi
+    if cmp -s "${stage}/sss.sh" "$current_path"; then
+        rm -rf -- "$stage"
+        return 1
+    fi
+    if ! atomic_replace "${stage}/sss.sh" "$current_path" 0755; then
+        rm -rf -- "$stage"
+        die "管理脚本原子更新失败，现有部署未修改"
+    fi
+    rm -rf -- "$stage"
+}
+
+self_update_and_exec() {
+    [[ "${SSS_SKIP_SELF_UPDATE:-0}" == "1" ]] && return
+    local source_path script_dir script_path
+    source_path="${BASH_SOURCE[0]}"
+    if [ ! -f "$source_path" ]; then
+        warn "当前运行方式无法自动更新脚本，将继续升级面板"
+        return
+    fi
+    script_dir=$(cd -- "$(dirname -- "$source_path")" && pwd) || die "无法定位管理脚本目录"
+    script_path="${script_dir}/$(basename -- "$source_path")"
+    if update_script_file "$script_path"; then
+        ok "管理脚本已更新，继续升级面板"
+        export SSS_SKIP_SELF_UPDATE=1
+        exec "$script_path" --upgrade "$@"
+        die "无法重新运行更新后的管理脚本"
+    fi
+}
+
 pre_check() {
     command -v systemctl >/dev/null 2>&1 || die "不支持此系统：未找到 systemctl 命令"
     [[ ${EUID} -eq 0 ]] || die "必须使用 root 用户运行此脚本"
@@ -696,8 +737,9 @@ clear 2>/dev/null
 banner
 pre_check
 if [[ "${1:-}" == "--upgrade" ]]; then
-    FORCE_INSTALL=1
     shift
+    self_update_and_exec "$@"
+    FORCE_INSTALL=1
 fi
 install_dashboard "$@"
 menu_loop

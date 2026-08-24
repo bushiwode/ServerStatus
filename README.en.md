@@ -106,18 +106,14 @@ If a bot token has appeared in a screenshot, chat, or public repository, revoke 
 
 ### 5. Update
 
-Updates preserve `config.json`, `.env`, and historical data under `json/`. The installer validates and pulls new images before replacement and attempts to restore the previous deployment if startup fails.
+Updates preserve `config.json`, `.env`, and historical data under `json/`. The management script safely updates itself first, then validates and pulls new images. If startup fails, it attempts to restore the previous deployment.
 
 ```bash
 cd /root/data/docker_data/serverstatus
-
-curl --fail --location \
-  https://raw.githubusercontent.com/Lau0x/ServerStatus/master/sss.sh \
-  -o sss.sh
-
-chmod +x sss.sh
 sudo ./sss.sh --upgrade
 ```
+
+Scripts installed before 2026-08-24 do not support self-update and need one final manual `sss.sh` download. Later updates only require the command above.
 
 Verify the deployment:
 
