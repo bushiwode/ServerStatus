@@ -526,6 +526,30 @@ print_agent_cmd() {
     line
 }
 
+show_node_install() {
+    ensure_config
+    list_nodes
+    local count idx name user pass
+    count=$(jq '.servers | length' "$CONFIG_FILE")
+    [ "$count" -eq 0 ] && return
+    echo
+    ask "请输入要查看安装信息的节点编号:"; read -r idx
+    [[ "$idx" =~ ^[0-9]+$ ]] || { err "无效输入"; return; }
+    [ "$idx" -ge "$count" ] && { err "编号超出范围"; return; }
+
+    if ! jq -e ".servers[$idx] | (.username | type == \"string\" and length > 0) and (.password | type == \"string\" and length > 0)" "$CONFIG_FILE" >/dev/null; then
+        err "该节点的安装凭据不完整，请重新添加节点"
+        return
+    fi
+    name=$(jq -r ".servers[$idx].name" "$CONFIG_FILE")
+    user=$(jq -r ".servers[$idx].username" "$CONFIG_FILE")
+    pass=$(jq -r ".servers[$idx].password" "$CONFIG_FILE")
+
+    warn "以下信息包含节点凭据，请勿公开转发"
+    info "请复制以下命令在机器 ${bold}${name}${plain} 重新安装 agent 服务:"
+    print_agent_cmd "$user" "$pass"
+}
+
 list_nodes() {
     ensure_config
     local count
@@ -651,6 +675,7 @@ menu_loop() {
         printf '%s\n' "  ${bold}操作菜单${plain}"
         printf '%s\n' "    ${green}1${plain}. 查看节点      ${green}2${plain}. 添加节点"
         printf '%s\n' "    ${green}3${plain}. 删除节点      ${green}4${plain}. 更新节点"
+        printf '%s\n' "    ${green}5${plain}. 查看安装信息"
         printf '%s\n' "    ${green}0${plain}. 退出"
         echo
         ask "请输入操作编号:"; read -r op
@@ -659,6 +684,7 @@ menu_loop() {
             2) add_node;    pause ;;
             3) remove_node; pause ;;
             4) update_node; pause ;;
+            5) show_node_install; pause ;;
             0) echo; ok "再见 👋"; exit 0 ;;
             *) err "无效输入"; pause ;;
         esac

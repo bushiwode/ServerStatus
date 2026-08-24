@@ -18,6 +18,17 @@ printf '%s\n' '{"servers":[{"name":"keep-stats"}]}' > json/stats.json
 sed '/^# ================= 入口 =================$/,$d' "${repo_root}/sss.sh" > sss-definitions.sh
 source sss-definitions.sh
 
+mkdir node-install-view
+cd node-install-view
+printf '%s\n' '{"servers":[{"name":"rebuild-node","location":"us","type":"kvm","username":"node-user","password":"node-password"}]}' > config.json
+CONFIG_FILE=config.json
+get_ip() { printf '%s' '203.0.113.10'; }
+install_output=$(printf '0\n' | show_node_install)
+grep -q '重新安装 agent 服务' <<< "$install_output"
+grep -q 'sss-agent.sh install 203.0.113.10 node-user' <<< "$install_output"
+grep -q '节点密码（安装时粘贴）: node-password' <<< "$install_output"
+cd "$test_root"
+
 file_mode() {
     stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1"
 }

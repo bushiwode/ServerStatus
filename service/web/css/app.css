@@ -641,8 +641,8 @@ html[data-layout="classic"] {
   --classic-row-hover: #f4f7f4;
   --classic-line: #dddddd;
   --classic-line-strong: #cecece;
-  --classic-text: #303030;
-  --classic-muted: #777777;
+  --classic-text: #1f1f1f;
+  --classic-muted: #555555;
   --classic-track: #f2f2f2;
   --classic-green: #51a351;
   --classic-green-dark: #3d963f;
@@ -658,8 +658,8 @@ html[data-theme="dark"][data-layout="classic"] {
   --classic-row-hover: #2b302b;
   --classic-line: #3a3a3a;
   --classic-line-strong: #4a4a4a;
-  --classic-text: #eeeeee;
-  --classic-muted: #aaaaaa;
+  --classic-text: #f4f4f4;
+  --classic-muted: #c2c2c2;
   --classic-track: #343434;
 }
 
@@ -719,7 +719,7 @@ html[data-layout="classic"] .theme-switch button {
   height: 44px;
   padding-inline: 11px;
   border-radius: 0;
-  color: #aaa;
+  color: #c8c8c8;
   font-size: 11px;
   font-weight: 400;
   text-shadow: 0 -1px 0 rgba(0,0,0,.75);
