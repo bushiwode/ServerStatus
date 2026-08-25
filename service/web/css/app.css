@@ -641,8 +641,8 @@ html[data-layout="classic"] {
   --classic-row-hover: #f4f7f4;
   --classic-line: #dddddd;
   --classic-line-strong: #cecece;
-  --classic-text: #1f1f1f;
-  --classic-muted: #555555;
+  --classic-text: #161616;
+  --classic-muted: #444444;
   --classic-track: #f2f2f2;
   --classic-green: #51a351;
   --classic-green-dark: #3d963f;
@@ -669,6 +669,9 @@ html[data-layout="classic"] body {
     var(--classic-page);
   color: var(--classic-text);
   font-family: "Helvetica Neue", Helvetica, Arial, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  font-weight: 500;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
 }
 html[data-layout="classic"] .page-glow { display: none; }
 html[data-layout="classic"] .app-shell {
@@ -691,7 +694,7 @@ html[data-layout="classic"] .brand h1 {
   color: #f5f5f5;
   font-family: "Helvetica Neue", Helvetica, Arial, "Noto Sans SC", sans-serif;
   font-size: 0;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0;
   text-shadow: 0 -1px 0 rgba(0,0,0,.8);
 }
@@ -720,8 +723,8 @@ html[data-layout="classic"] .theme-switch button {
   padding-inline: 11px;
   border-radius: 0;
   color: #c8c8c8;
-  font-size: 11px;
-  font-weight: 400;
+  font-size: 12px;
+  font-weight: 500;
   text-shadow: 0 -1px 0 rgba(0,0,0,.75);
 }
 html[data-layout="classic"] .theme-switch button { width: 30px; padding-inline: 7px; }
@@ -770,7 +773,7 @@ html[data-layout="classic"] main {
   border-bottom: 2px solid var(--classic-line);
   background: var(--classic-panel);
   text-align: center;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: none;
@@ -807,6 +810,7 @@ html[data-layout="classic"] main {
   border-bottom: 1px solid var(--classic-line);
   color: var(--classic-text);
   background: var(--classic-row);
+  font-weight: 500;
   text-align: center;
   vertical-align: middle;
   white-space: nowrap;
@@ -819,10 +823,10 @@ html[data-layout="classic"] main {
   overflow: hidden;
   color: var(--classic-text);
   font-size: 13px;
-  font-weight: 400;
+  font-weight: 500;
   text-overflow: ellipsis;
 }
-.classic-type, .classic-region, .classic-number { font-family: inherit; font-size: 12px; }
+.classic-type, .classic-region, .classic-number { font-family: inherit; font-size: 13px; }
 .classic-cell {
   display: grid;
   place-items: center;
@@ -832,14 +836,14 @@ html[data-layout="classic"] main {
   border-radius: 4px;
   color: #111;
   background: linear-gradient(180deg, #5bb75b, var(--classic-green-dark));
-  font-size: 12px;
+  font-size: 13px;
   text-shadow: none;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
 }
 .classic-cell.monthly { border-color: #46a546; color: #111; background: linear-gradient(180deg, #62c462, var(--classic-green)); text-shadow: none; }
 .classic-cell.offline { border-color: #a9302a; color: #111; background: linear-gradient(180deg, #ee5f5b, var(--classic-red)); }
 .classic-cell.monthly.offline { border-color: #df8505; color: #111; background: linear-gradient(180deg, #fbb450, var(--classic-orange)); text-shadow: none; }
-.classic-flow { color: var(--classic-text); font-family: inherit; font-size: 12px; }
+.classic-flow { color: var(--classic-text); font-family: inherit; font-size: 13px; }
 .classic-flow small { color: var(--classic-muted); font-size: 10px; }
 .classic-meter {
   position: relative;
@@ -868,7 +872,7 @@ html[data-layout="classic"] main {
   padding-left: 5px;
   color: var(--classic-text);
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   text-shadow: none;
 }
 .classic-meter.offline { border-color: #a9302a; background: linear-gradient(180deg, #ee5f5b, var(--classic-red)); }
@@ -881,7 +885,7 @@ html[data-layout="classic"] main {
   color: #111;
   background: linear-gradient(180deg, #62c462, var(--classic-green));
   font-family: inherit;
-  font-size: 11px;
+  font-size: 12px;
 }
 .carrier-cell.warn { border-color: #df8505; background: linear-gradient(180deg, #fbb450, var(--classic-orange)); }
 .carrier-cell.bad { border-color: #a9302a; color: #111; background: linear-gradient(180deg, #ee5f5b, var(--classic-red)); }
@@ -897,7 +901,7 @@ html[data-layout="classic"] main {
   border-top: 0;
   background: var(--classic-panel);
   font-family: inherit;
-  font-size: 11px;
+  font-size: 12px;
 }
 html[data-layout="classic"] .foot { padding-top: 7px; font-size: 9px; }
 
