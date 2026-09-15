@@ -27,7 +27,7 @@ services:
     image: "${SSS_WEB_IMAGE:-ghcr.io/lau0x/serverstatus-web@sha256:05a95c44a4138bb507c4947a6a9c3d83ae4b6fdd4ff8cde13546d954b3903f28}"
     restart: unless-stopped
     volumes:
-      - ./json:/usr/share/nginx/html/json:ro
+      - ./service/web/default.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - "${SSS_WEB_BIND:-0.0.0.0}:${SSS_WEB_PORT:-8081}:80"
     depends_on:
