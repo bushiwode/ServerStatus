@@ -6,7 +6,7 @@ SSS_BASE_PATH="/opt/sss"
 SSS_AGENT_PATH="${SSS_BASE_PATH}/agent"
 SSS_AGENT_SERVICE="/etc/systemd/system/sss-agent.service"
 SSS_AGENT_ENV="/etc/sss-agent.env"
-GITHUB_RAW_URL="${SSS_RAW_BASE:-https://raw.githubusercontent.com/Lau0x/ServerStatus/master}"
+GITHUB_RAW_URL="${SSS_RAW_BASE:-https://raw.githubusercontent.com/bushiwode/ServerStatus/master}"
 
 red='\033[0;31m'
 green='\033[0;32m'
