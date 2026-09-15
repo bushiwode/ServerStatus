@@ -1,6 +1,5 @@
 # ServerStatus
 
-[简体中文](README.md) | [English](README.en.md)
 
 基于 [cppla/ServerStatus](https://github.com/cppla/ServerStatus) 的轻量级多服务器监控面板。这个 Fork 增加了交互式节点管理、systemd Agent、Telegram 通知，以及可切换的 Classic / Modern 两套中英文 Web 界面。
 
