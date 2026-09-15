@@ -448,6 +448,17 @@ install_dashboard() {
     download_file "${GITHUB_RAW_URL}/docker-compose.yml" "${stage}/docker-compose.yml" || {
         abort_install "$stage" "Compose 下载失败，部署未修改"
     }
+    
+    install -d -m 0755 "${stage}/service/web" || {
+    abort_install "$stage" "创建 Web 配置暂存目录失败，部署未修改"
+    }
+
+    download_file \
+        "${GITHUB_RAW_URL}/service/web/default.conf" \
+        "${stage}/service/web/default.conf" || {
+        abort_install "$stage" "Web 实时配置下载失败，部署未修改"
+    }
+    
     if ! configure_bot "${stage}/env.next" "$@"; then
         abort_install "$stage" "Telegram 配置失败，原 .env 未修改"
     fi
@@ -458,7 +469,16 @@ install_dashboard() {
     if ! compose_file "${stage}/docker-compose.yml" "${stage}/env.next" pull; then
         abort_install "$stage" "新镜像拉取失败，现有部署未修改"
     fi
-
+    install -d -m 0755 service/web || {
+        abort_install "$stage" "创建 Web 配置目录失败，Compose 尚未替换"
+    }
+    
+    if ! atomic_replace \
+        "${stage}/service/web/default.conf" \
+        "service/web/default.conf" \
+        0644; then
+        abort_install "$stage" "安装 Web 实时配置失败，Compose 尚未替换"
+    fi
     install -d -m 0755 json || {
         abort_install "$stage" "创建数据目录失败，Compose 尚未替换"
     }
@@ -710,7 +730,7 @@ menu_loop() {
     while true; do
         clear 2>/dev/null
         banner
-        printf '%s\n' "${dim}  使用教程: https://github.com/Lau0x/ServerStatus#使用指南${plain}"
+        printf '%s\n' "${dim}  使用教程: https://github.com/bushiwode/ServerStatus#使用指南${plain}"
         list_nodes
         echo
         printf '%s\n' "  ${bold}操作菜单${plain}"
