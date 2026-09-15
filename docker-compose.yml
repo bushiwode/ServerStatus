@@ -22,7 +22,7 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # 前端面板: 静态资源打包进镜像, 运行时读取共享的 json/stats.json
+  # 前端面板: 静态资源来自 Web 镜像，/json/stats.json 实时代理到 srv HTTP API
   web:
     image: "${SSS_WEB_IMAGE:-ghcr.io/lau0x/serverstatus-web@sha256:05a95c44a4138bb507c4947a6a9c3d83ae4b6fdd4ff8cde13546d954b3903f28}"
     restart: unless-stopped
