@@ -26,7 +26,7 @@ mkdir -p /root/data/docker_data/serverstatus
 cd /root/data/docker_data/serverstatus
 
 curl --fail --location \
-  https://raw.githubusercontent.com/Lau0x/ServerStatus/master/sss.sh \
+  https://raw.githubusercontent.com/bushiwode/ServerStatus/master/sss.sh \
   -o sss.sh
 
 chmod +x sss.sh
@@ -82,7 +82,7 @@ journalctl -u sss-agent -n 100 --no-pager
 
 ```bash
 curl --fail --location \
-  https://raw.githubusercontent.com/Lau0x/ServerStatus/master/agent/sss-agent.sh \
+  https://raw.githubusercontent.com/bushiwode/ServerStatus/master/agent/sss-agent.sh \
   -o sss-agent.sh
 
 chmod +x sss-agent.sh
@@ -137,7 +137,7 @@ cp -a /root/data/docker_data/serverstatus \
 
 cd /root/data/docker_data/serverstatus
 curl --fail --location \
-  https://raw.githubusercontent.com/Lau0x/ServerStatus/master/sss.sh \
+  https://raw.githubusercontent.com/bushiwode/ServerStatus/master/sss.sh \
   -o sss.sh
 chmod +x sss.sh
 sudo ./sss.sh --upgrade
