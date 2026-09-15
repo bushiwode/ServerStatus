@@ -6,10 +6,10 @@ set -u
 #   System Required: CentOS 7+ / Debian 8+ / Ubuntu 16+ /
 #     Arch 未测试
 #   Description: Server Status 监控安装 + 节点管理脚本
-#   Github: https://github.com/Lau0x/ServerStatus
+#   Github: https://github.com/bushiwode/ServerStatus
 #========================================================
 
-GITHUB_RAW_URL="${SSS_RAW_BASE:-https://raw.githubusercontent.com/Lau0x/ServerStatus/master}"
+GITHUB_RAW_URL="${SSS_RAW_BASE:-https://raw.githubusercontent.com/bushiwode/ServerStatus/master}"
 CONFIG_FILE="config.json"
 COMPOSE_CMD=()
 FORCE_INSTALL=0
