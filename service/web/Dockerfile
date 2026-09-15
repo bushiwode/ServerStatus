@@ -1,7 +1,8 @@
 FROM nginx:alpine
 
-LABEL maintainer="lidalao"
-LABEL description="Static dashboard frontend for ServerStatus"
+LABEL maintainer="bushiwode"
+LABEL description="ServerStatus dashboard frontend"
 
-# 前端静态资源打包进镜像(json/stats.json 运行时由 ./json 挂载提供)
+COPY default.conf /etc/nginx/conf.d/default.conf
 COPY . /usr/share/nginx/html
+RUN rm -f /usr/share/nginx/html/default.conf
